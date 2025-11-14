@@ -12,6 +12,9 @@ function startNewGame() {
   generateDailyPrices();
   renderAll();
 }
+function vibrate(ms = 30) {
+  if (navigator.vibrate) navigator.vibrate(ms);
+}
 
 function attachGlobalListeners() {
   const btnEndDay = document.getElementById("btn-end-day");
