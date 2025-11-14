@@ -383,3 +383,6 @@ button {
     border-radius: 20px;
   }
 }
+#modal-overlay.hidden {
+  display: none !important;
+}
