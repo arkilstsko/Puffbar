@@ -51,7 +51,10 @@ function attachGlobalListeners() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  hideModal(); // sikkerhed – skjul modal ved start
-  startNewGame();
+  const modal = document.getElementById("modal-overlay");
+  modal.classList.add("hidden"); // HARD FORCE HIDE
+
   attachGlobalListeners();
+  initGameState();
+  renderAll();
 });
