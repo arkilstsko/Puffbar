@@ -403,6 +403,32 @@ function travelTo(locationId) {
     return;
   }
 
+  // Betal for rejsen
+  gameState.money -= travelCost;
+  const oldLoc = getLocationById(gameState.locationId).name;
+  gameState.locationId = locationId;
+
+  logEvent(
+    "Travel",
+    "City",
+    `Du rejser fra ${oldLoc} til ${loc.name} og bruger $${travelCost}.`
+  );
+
+  // REJSE = NY DAG
+  applyEndOfDayCycle(true);
+
+  // Ny dag = nye priser
+  generateDailyPrices();
+  logEvent(
+    "New day",
+    "Game",
+    `Ny dag efter rejsen. Byen føles anderledes, og priserne ændrer sig.`
+  );
+
+  renderAll();
+}
+
+
   gameState.money -= travelCost;
   gameState.locationId = locationId;
   logEvent(
