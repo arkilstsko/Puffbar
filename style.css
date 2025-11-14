@@ -232,6 +232,14 @@ button {
 .location-btn:active {
   transform: scale(0.97);
 }
+.fade-in {
+  opacity: 0;
+  animation: fade 0.25s forwards;
+}
+
+@keyframes fade {
+  to { opacity: 1; }
+}
 
 
 /* ------------------------------------------------------------
