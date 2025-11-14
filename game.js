@@ -555,6 +555,7 @@ function attachGlobalListeners() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  hideModal();            // sørger for at overlay er væk fra start
   attachGlobalListeners();
   initGameState();
   renderAll();
