@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PuffLord – Vape Hustle Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-root">
+    <header id="game-header">
+      <div class="logo-block">
+        <div class="logo-title">PuffLord</div>
+        <div class="logo-subtitle">Teenage Vape Hustle</div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-pill"><span>Day</span><strong id="stat-day">1</strong></div>
+        <div class="stat-pill"><span>Cash</span><strong id="stat-money">$0</strong></div>
+        <div class="stat-pill"><span>Location</span><strong id="stat-location">Downtown</strong></div>
+        <div class="stat-pill"><span>Capacity</span>
+          <strong><span id="stat-capacity-used">0</span>/<span id="stat-capacity-max">0</span></strong>
+        </div>
+      </div>
+      <div class="risk-bar-wrapper">
+        <span class="risk-label">Heat</span>
+        <div class="risk-bar">
+          <div id="risk-bar-fill"></div>
+        </div>
+        <span id="risk-bar-text">0%</span>
+      </div>
+    </header>
+
+    <main id="game-layout">
+      <section id="inventory-panel" class="panel">
+        <h2>Backpack</h2>
+        <p class="panel-subtitle">Dine puffbars – hold øje med pladsen.</p>
+        <div id="inventory-list" class="table-list"></div>
+      </section>
+
+      <section id="market-panel" class="panel">
+        <h2>Street Deals</h2>
+        <p class="panel-subtitle">Køb billigt, sælg dyrt. Priserne skifter hver dag.</p>
+        <div id="market-list" class="table-list"></div>
+      </section>
+
+      <section id="status-panel" class="panel">
+        <h2>City Feed</h2>
+        <p class="panel-subtitle">Rygter, raids og trends.</p>
+        <div id="news-banner"></div>
+        <div id="event-log" class="log-list"></div>
+
+        <h3>Travel</h3>
+        <div id="location-buttons" class="location-buttons"></div>
+      </section>
+    </main>
+
+    <footer id="game-footer">
+      <button id="btn-end-day" class="primary-btn">End Day</button>
+      <button id="btn-new-game" class="ghost-btn">New Game</button>
+      <div class="footer-tip">
+        Tip: Varer er billigere nogle steder, men risikoen kan være højere.
+      </div>
+    </footer>
+  </div>
+
+  <div id="modal-overlay" class="hidden">
+    <div id="modal-window">
+      <h2 id="modal-title"></h2>
+      <div id="modal-body"></div>
+      <button id="modal-close" class="primary-btn">OK</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
