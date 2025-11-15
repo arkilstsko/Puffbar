@@ -1,36 +1,54 @@
 // travel.js
-// Rejse mellem bydele + end day
+// Handles travelling between locations and ending the day cycle.
 
-import { gameState, getLocationById, logEvent } from "./state.js";
-import { applyEndOfDayCycle } from "./events.js";
+import {
+  gameState,
+  getLocationById,
+  adjustRisk,
+  recordTravel,
+  getTransportOption,
+} from "./state.js";
+import { ensureDailyQuests, updateQuestProgress } from "./quests.js";
+import { advanceDayCycle } from "./events.js";
 import { generateDailyPrices } from "./prices.js";
+import { addLogEntry } from "./state.js";
+import { saveState } from "./save.js";
+
+const BASE_TRAVEL_COST = 10;
 
 export function travelTo(locationId) {
   const target = getLocationById(locationId);
-  if (!target) return;
+  if (!target) return false;
+  if (gameState.locationId === target.id) return false;
 
-  const travelCost = 5;
-  if (gameState.money < travelCost) {
-    // modal kaldes indirekte via showModal i UI hvis du vil, men her bare direkte info
-    // (vi kan godt bruge showModal her, men for nu holder vi det simpelt).
-    return;
-  }
+  const transport = getTransportOption();
+  const travelCost = Math.max(2, Math.round((transport.travelCost || BASE_TRAVEL_COST) * target.travelCost));
+  if (gameState.money < travelCost) return false;
 
-  const oldLoc = getLocationById(gameState.locationId)?.name || "?";
   gameState.money -= travelCost;
-  gameState.locationId = locationId;
+  recordTravel(target.id);
+  updateQuestProgress("travel", { unique: gameState.daily.travelVisited.length });
 
-  logEvent("Travel", "City", `Du rejser fra ${oldLoc} til ${target.name} og bruger $${travelCost}.`);
+  const riskGain = Math.max(0, Math.round((transport.riskDelta ?? 3) * target.riskModifier));
+  if (riskGain > 0) adjustRisk(riskGain);
 
-  // Rejse tæller som en dag
-  applyEndOfDayCycle(true);
+  addLogEntry(
+    "Travel",
+    `Rejste til ${target.name} og betalte $${travelCost}. Varme steg med ${riskGain}.`
+  );
+  gameState.locationId = target.id;
+
+  advanceDayCycle({ viaTravel: true });
+  ensureDailyQuests();
   generateDailyPrices();
-
-  logEvent("New day", "Game", "Ny dag efter rejsen – priserne har ændret sig.");
+  saveState();
+  return true;
 }
 
 export function endDay() {
-  applyEndOfDayCycle(false);
+  advanceDayCycle({ viaTravel: false });
+  ensureDailyQuests();
   generateDailyPrices();
-  logEvent("New day", "Game", "Ny dag – byen ændrer sig.");
+  saveState();
+  return true;
 }

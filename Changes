@@ -1,0 +1,6 @@
+# PuffLord Update - 2024-05-12
+
+- Overhauled the PuffLord architecture into modular ES6 files covering trading, travel, events, upgrades, quests, achievements, storage, and persistence.
+- Redesigned the mobile-first UI with stacked panels for market, inventory, warehouse, upgrades, investments, quests, achievements, and travel plus swipe gestures and haptic feedback hooks.
+- Implemented advanced systems: dynamic pricing with rivals, raids, daily NPC events, quest rewards, achievements, prestige, warehouse transfers, transport/backpack upgrades, and passive investments.
+- Added a robust modal implementation, full localStorage autosave with reset controls, and refreshed PWA assets/service worker including manifest versioning.

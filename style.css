@@ -1,21 +1,28 @@
 /* ------------------------------------------------------------
    GLOBAL
 ------------------------------------------------------------ */
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  user-select: none;
+}
+
+:root {
+  color-scheme: dark;
+  font-size: 16px;
 }
 
 body {
   background: #0d1117;
-  color: #fff;
+  color: #f9fafb;
   font-family: "Inter", "Roboto", sans-serif;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
-  padding-bottom: 60px;
+  padding-bottom: 70px;
+}
+
+a {
+  color: inherit;
 }
 
 h1, h2, h3 {
@@ -26,176 +33,184 @@ button {
   cursor: pointer;
   border: none;
   font-family: inherit;
+  font-weight: 600;
 }
 
-
 /* ------------------------------------------------------------
-   GAME ROOT + LAYOUT
+   GAME ROOT + PANELS
 ------------------------------------------------------------ */
-
 #game-root {
   width: 100%;
-  max-width: 580px;
+  max-width: 620px;
   margin: 0 auto;
-  padding: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
-
-
-/* ------------------------------------------------------------
-   PANELS
------------------------------------------------------------- */
 
 .panel {
   background: #111827;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 16px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .panel h2 {
-  font-size: 18px;
-  margin-bottom: 6px;
+  font-size: 1.2rem;
 }
 
 .panel-subtitle {
-  font-size: 13px;
+  font-size: 0.85rem;
   opacity: 0.7;
 }
 
+.logo-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.logo-title {
+  font-size: 1.6rem;
+  letter-spacing: 0.03em;
+}
+
+.logo-subtitle {
+  font-size: 0.9rem;
+  color: #60a5fa;
+}
 
 /* ------------------------------------------------------------
    HEADER
 ------------------------------------------------------------ */
-
 #game-header {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
 
 .header-stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 8px;
-}
-
-.hidden {
-  display: none !important;
 }
 
 .stat-pill {
   background: #1f2937;
-  padding: 10px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 14px;
   text-align: center;
-  font-size: 16px;
-  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
 }
 
-#risk-bar-wrapper {
+.stat-pill strong {
+  font-size: 1.05rem;
+}
+
+.risk-bar-wrapper {
   width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
+}
+
+.risk-label {
+  font-size: 0.85rem;
+  opacity: 0.75;
 }
 
 .risk-bar {
   flex-grow: 1;
-  height: 12px;
+  height: 14px;
   background: #1f2937;
   border-radius: 10px;
   overflow: hidden;
-  margin-left: 10px;
 }
 
 #risk-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg,#22c55e,#eab308,#ef4444);
+  background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+  width: 0%;
   transition: width 0.2s ease;
 }
 
+.prestige-banner {
+  min-height: 24px;
+  font-size: 0.85rem;
+  color: #fbbf24;
+}
 
 /* ------------------------------------------------------------
-   MARKET + INVENTORY TABLES
+   TABLE LISTS
 ------------------------------------------------------------ */
-
 .table-list {
   width: 100%;
   overflow-x: auto;
-  scrollbar-width: thin;
 }
 
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 45% 20% 15% 20%;
-  padding: 10px 4px;
+  grid-template-columns: 1.1fr 0.5fr 0.5fr 0.9fr;
+  gap: 6px;
+  padding: 10px 6px;
+  align-items: center;
 }
 
 .table-header {
-  font-weight: 600;
-  font-size: 14px;
-  border-bottom: 1px solid #374151;
   color: #93c5fd;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #1f2937;
 }
 
 .table-row {
   border-bottom: 1px solid #1f2937;
-  font-size: 14px;
+  font-size: 0.9rem;
+}
+
+.table-row:last-child {
+  border-bottom: none;
 }
 
 .product-name {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .product-name .desc {
-  font-size: 11px;
+  font-size: 0.75rem;
   opacity: 0.7;
-  margin-top: 2px;
 }
 
 .btn-group {
   display: flex;
-  gap: 5px;
+  gap: 6px;
 }
-
-
-/* ------------------------------------------------------------
-   BUTTONS (game feel!)
------------------------------------------------------------- */
 
 .row-btn,
 .primary-btn,
 .ghost-btn {
-  padding: 12px 15px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 15px;
-  transition: 0.08s ease;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition: transform 0.12s ease, background 0.2s ease;
 }
 
 .row-btn {
-  padding: 8px 12px;
-  font-size: 14px;
-}
-
-.primary-btn {
+  padding: 10px 12px;
+  font-size: 0.9rem;
   background: #2563eb;
-  color: white;
+  color: #fff;
 }
 
-.primary-btn:active,
-.row-btn:active {
-  transform: scale(0.94);
-}
-
-.ghost-btn {
-  background: #1f2937;
-  color: #9ca3af;
+.row-btn.sell {
+  background: #0ea5e9;
 }
 
 .row-btn:disabled {
@@ -203,12 +218,30 @@ button {
   background: #374151;
 }
 
+.row-btn:active,
+.primary-btn:active,
+.ghost-btn:active {
+  transform: scale(0.97);
+}
+
+.primary-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.ghost-btn {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.ghost-btn.danger {
+  color: #f87171;
+}
 
 /* ------------------------------------------------------------
    LOCATION BUTTONS
 ------------------------------------------------------------ */
-
-#location-buttons {
+.location-buttons {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -218,15 +251,17 @@ button {
   width: 100%;
   padding: 14px;
   background: #1f2937;
-  border-radius: 12px;
+  border-radius: 14px;
   color: #e5e7eb;
   text-align: left;
-  font-size: 15px;
-  transition: 0.1s ease;
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .location-btn strong {
-  font-size: 17px;
+  font-size: 1.05rem;
 }
 
 .location-btn.active {
@@ -236,153 +271,162 @@ button {
 .location-btn:active {
   transform: scale(0.97);
 }
-.fade-in {
-  opacity: 0;
-  animation: fade 0.25s forwards;
-}
-
-@keyframes fade {
-  to { opacity: 1; }
-}
-
-
-/* ------------------------------------------------------------
-   NEWS BANNER
------------------------------------------------------------- */
-
-#news-banner {
-  background: #1e293b;
-  padding: 12px;
-  border-radius: 12px;
-  text-align: center;
-  font-size: 13px;
-  color: #93c5fd;
-  font-weight: 500;
-}
-
 
 /* ------------------------------------------------------------
    LOG VIEW
 ------------------------------------------------------------ */
-
 #event-log {
-  max-height: 300px;
+  max-height: 220px;
   overflow-y: auto;
-  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .log-entry {
-  font-size: 13px;
+  font-size: 0.85rem;
   border-bottom: 1px dashed #1f2937;
-  padding: 6px 0;
+  padding-bottom: 4px;
 }
 
-.log-entry .time {
-  color: #60a5fa;
-  font-weight: 600;
-  margin-right: 6px;
+/* ------------------------------------------------------------
+   LIST PANELS (quests, upgrades, etc.)
+------------------------------------------------------------ */
+.list-card {
+  background: #1f2937;
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
+.list-card h3 {
+  font-size: 1rem;
+}
+
+.list-card .meta {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #0f172a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #22d3ee, #6366f1);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(37, 99, 235, 0.2);
+  color: #93c5fd;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+}
+
+.badge.success {
+  background: rgba(34, 197, 94, 0.18);
+  color: #bbf7d0;
+}
 
 /* ------------------------------------------------------------
    FOOTER
 ------------------------------------------------------------ */
-
 #game-footer {
+  gap: 16px;
+}
+
+.footer-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .footer-tip {
   text-align: center;
   opacity: 0.7;
-  font-size: 12px;
+  font-size: 0.8rem;
 }
-
 
 /* ------------------------------------------------------------
    MODAL
 ------------------------------------------------------------ */
-
 #modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(13, 16, 23, 0.85);
-  display: none; /* DEFAULT hidden */
-  place-items: center;
-  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
-
-#modal-overlay.show {
-  display: grid !important;
-}
-
 
 #modal-window {
-  width: 90vw;
+  width: min(90vw, 400px);
   background: #1f2937;
-  border-radius: 16px;
-  padding: 20px;
-  max-width: 400px;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   text-align: center;
 }
 
 #modal-window h2 {
-  font-size: 20px;
+  font-size: 1.2rem;
   margin-bottom: 10px;
 }
 
 #modal-body {
-  font-size: 15px;
+  font-size: 0.95rem;
   margin-bottom: 20px;
-  color: #e0e5eb;
+  color: #dbeafe;
 }
 
-#modal-close {
-  width: 100%;
+.modal-hidden {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
 }
-
 
 /* ------------------------------------------------------------
-   MOBILE-SPECIFIC OPTIMIZATION
+   MEDIA QUERIES
 ------------------------------------------------------------ */
-
-@media (max-width: 680px) {
-
-  body {
-    font-size: 15px;
-  }
-
+@media (min-width: 520px) {
   .table-header,
   .table-row {
-    font-size: 13px;
-    padding: 10px 3px;
+    grid-template-columns: 1.2fr 0.4fr 0.4fr 0.9fr;
   }
 
-  .primary-btn,
-  .ghost-btn {
-    padding: 15px 20px;
-    font-size: 17px;
-    border-radius: 14px;
+  .footer-actions {
+    flex-direction: row;
   }
 
-  .row-btn {
-    padding: 10px 13px;
+  .footer-actions button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 420px) {
+  :root {
     font-size: 15px;
   }
 
-  .location-btn {
-    padding: 16px;
-    font-size: 16px;
-    border-radius: 14px;
+  .stat-pill {
+    font-size: 0.8rem;
   }
 
-  #modal-window {
-    padding: 24px;
-    border-radius: 20px;
+  .row-btn,
+  .primary-btn,
+  .ghost-btn {
+    font-size: 0.9rem;
   }
-}
-#modal-overlay.hidden {
-  display: none !important;
 }
