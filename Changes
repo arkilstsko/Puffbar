@@ -4,3 +4,10 @@
 - Redesigned the mobile-first UI with stacked panels for market, inventory, warehouse, upgrades, investments, quests, achievements, and travel plus swipe gestures and haptic feedback hooks.
 - Implemented advanced systems: dynamic pricing with rivals, raids, daily NPC events, quest rewards, achievements, prestige, warehouse transfers, transport/backpack upgrades, and passive investments.
 - Added a robust modal implementation, full localStorage autosave with reset controls, and refreshed PWA assets/service worker including manifest versioning.
+
+# PuffLord Update - 2024-05-15
+- Replaced the static dashboard with a Framework7-powered mobile layout featuring a five-tab bottom navigation bar, animated transitions, and a travel bottom drawer with slide-to-confirm interactions.
+- Implemented persistent bottom-sheet modals, refreshed styling, and gesture controls (global swipe down to end day, swipe up to open travel, horizontal product swipes for quick trades) with semantic haptic feedback.
+- Rebuilt the UI rendering layer to efficiently diff market, inventory, travel, upgrade, and quest views using the new modular architecture orchestrated by app.js.
+- Introduced a non-cheesable quest system that tracks start-of-day inventory, profit, travel risk caps, and raid streaks with animated progress and claimable reward cards.
+- Updated travel, events, and state management modules to capture daily baselines, raid streaks, and quest summaries while keeping storage persistence and manifest versioning in sync.

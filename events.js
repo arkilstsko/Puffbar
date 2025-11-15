@@ -15,28 +15,44 @@ import { expireOldQuests, updateQuestProgress } from "./quests.js";
 import { evaluateAchievements } from "./achievements.js";
 import { showModal } from "./modal.js";
 import { saveState } from "./save.js";
+import { hapticLong } from "./feedback.js";
 
 export function advanceDayCycle({ viaTravel = false } = {}) {
-  const profitToday = gameState.daily.profit;
-  const uniqueVisits = gameState.daily.travelVisited.length;
-
   expireOldQuests();
   processInvestmentsDaily();
 
   gameState.marketModifiers = [];
   gameState.news = "Stilhed i gaderne. Hold øje med muligheder.";
 
-  handleRaidChance();
+  const raidHappened = handleRaidChance();
   handleNpcFlavor();
   handleRivalEvent();
+
+  const summary = {
+    profit: gameState.daily.profit,
+    travelCount: gameState.daily.travelVisited.length,
+    riskPeak: gameState.daily.riskPeak,
+    hadRaid: raidHappened || gameState.daily.hadRaid,
+  };
+
+  const nextNoRaidStreak = summary.hadRaid ? 0 : (gameState.stats.noRaidStreak || 0) + 1;
+  gameState.stats.noRaidStreak = nextNoRaidStreak;
+
+  if (summary.hadRaid) {
+    updateQuestProgress("raid", { occurred: true });
+  }
+  updateQuestProgress("profit", { profit: summary.profit });
+  updateQuestProgress("day-end", {
+    profit: summary.profit,
+    travelCount: summary.travelCount,
+    riskPeak: summary.riskPeak,
+    noRaidStreak: nextNoRaidStreak,
+  });
 
   gameState.day += 1;
   const riskDrop = viaTravel ? 2 : 3;
   adjustRisk(-riskDrop);
   resetDailyTrackers();
-
-  updateQuestProgress("profit", { value: profitToday });
-  updateQuestProgress("travel", { unique: uniqueVisits });
 
   evaluateAchievements("day");
   saveState();
@@ -67,8 +83,11 @@ function handleRaidChance() {
     const message = `Politiet lavede en raid! Mistede ca. ${lostItems} varer og fik en bøde på $${fine}.`;
     addLogEntry("Raid", message);
     showModal("Raid", message);
+    hapticLong();
     evaluateAchievements("raid");
+    return true;
   }
+  return false;
 }
 
 function handleNpcFlavor() {

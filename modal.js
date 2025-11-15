@@ -1,37 +1,44 @@
 // modal.js
-// Minimal modal system with safe defaults.
+// Bottom-sheet modal implementation using Framework7 sheets.
 
-const overlayId = "modal-overlay";
-const titleId = "modal-title";
-const bodyId = "modal-body";
-const closeId = "modal-close";
+let sheetInstance = null;
 
-export function initModal() {
-  const overlay = document.getElementById(overlayId);
-  const closeBtn = document.getElementById(closeId);
-  hideModal();
-  if (overlay) {
-    overlay.addEventListener("click", (event) => {
-      if (event.target === overlay) hideModal();
-    });
-  }
+export function initModal(app) {
+  const sheetEl = document.getElementById("info-sheet");
+  if (!sheetEl || !app) return;
+  sheetInstance = app.sheet.create({
+    el: sheetEl,
+    swipeToClose: true,
+    backdrop: true,
+    closeByOutsideClick: true,
+  });
+
+  const closeBtn = document.getElementById("info-sheet-close");
   if (closeBtn) {
-    closeBtn.addEventListener("click", hideModal);
+    closeBtn.addEventListener("click", () => {
+      hideModal();
+    });
   }
 }
 
-export function showModal(title, body) {
-  const overlay = document.getElementById(overlayId);
-  if (!overlay) return;
-  const titleEl = document.getElementById(titleId);
-  const bodyEl = document.getElementById(bodyId);
+export function showModal(title, body, { html = false } = {}) {
+  const titleEl = document.getElementById("info-sheet-title");
+  const bodyEl = document.getElementById("info-sheet-body");
   if (titleEl) titleEl.textContent = title;
-  if (bodyEl) bodyEl.textContent = body;
-  overlay.classList.remove("modal-hidden");
+  if (bodyEl) {
+    if (html) {
+      bodyEl.innerHTML = body;
+    } else {
+      bodyEl.textContent = body;
+    }
+  }
+  if (sheetInstance) {
+    sheetInstance.open();
+  }
 }
 
 export function hideModal() {
-  const overlay = document.getElementById(overlayId);
-  if (!overlay) return;
-  overlay.classList.add("modal-hidden");
+  if (sheetInstance) {
+    sheetInstance.close();
+  }
 }

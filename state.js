@@ -43,6 +43,14 @@ function defaultDailyState() {
     boughtToday: {},
     travelVisited: [],
     riskShield: 0,
+    baselineInventory: createInventoryMap(),
+    baselineInventoryRemaining: createInventoryMap(),
+    soldFromBaseline: createInventoryMap(),
+    baselineMoney: 0,
+    raidsToday: 0,
+    riskPeak: 0,
+    riskFloor: 0,
+    hadRaid: false,
   };
 }
 
@@ -70,6 +78,7 @@ export const gameState = {
     prestigeCount: 0,
     lifetimeNetProfit: 0,
     totalTravels: 0,
+    noRaidStreak: 0,
   },
   meta: {
     permanentRiskDrop: 0,
@@ -139,6 +148,7 @@ export function hydrateGameState(saved) {
     prestigeCount: 0,
     lifetimeNetProfit: 0,
     totalTravels: 0,
+    noRaidStreak: 0,
   };
   if (saved.stats) {
     for (const key of Object.keys(stats)) {
@@ -162,7 +172,36 @@ export function hydrateGameState(saved) {
     ? saved.marketModifiers
     : [];
   gameState.rivalMessage = safe("rivalMessage", "");
-  gameState.daily = saved.daily ? { ...defaultDailyState(), ...saved.daily } : defaultDailyState();
+  const dailyState = defaultDailyState();
+  if (saved.daily) {
+    Object.assign(dailyState, saved.daily);
+    dailyState.baselineInventory = mergeInventoryMap(
+      saved.daily.baselineInventory,
+      createInventoryMap()
+    );
+    dailyState.baselineInventoryRemaining = mergeInventoryMap(
+      saved.daily.baselineInventoryRemaining || saved.daily.baselineInventory,
+      createInventoryMap()
+    );
+    dailyState.soldFromBaseline = mergeInventoryMap(
+      saved.daily.soldFromBaseline,
+      createInventoryMap()
+    );
+    dailyState.soldToday = saved.daily.soldToday || {};
+    dailyState.boughtToday = saved.daily.boughtToday || {};
+  }
+  gameState.daily = dailyState;
+  gameState.daily.baselineMoney = Number(gameState.daily.baselineMoney || gameState.money);
+  if (!Number.isFinite(gameState.daily.riskPeak) || gameState.daily.riskPeak === 0) {
+    gameState.daily.riskPeak = gameState.risk;
+  } else {
+    gameState.daily.riskPeak = Math.max(gameState.daily.riskPeak, gameState.risk);
+  }
+  if (!Number.isFinite(gameState.daily.riskFloor) || gameState.daily.riskFloor === 0) {
+    gameState.daily.riskFloor = gameState.risk;
+  } else {
+    gameState.daily.riskFloor = Math.min(gameState.daily.riskFloor, gameState.risk);
+  }
 }
 
 export function getSerializableState() {
@@ -220,12 +259,14 @@ export function resetGameState({ keepMeta = true } = {}) {
       prestigeCount,
       lifetimeNetProfit: 0,
       totalTravels: 0,
+      noRaidStreak: 0,
     },
     meta: preservedMeta,
     marketModifiers: [],
     rivalMessage: "",
     daily: defaultDailyState(),
   });
+  resetDailyTrackers();
 }
 
 export function applyPrestige() {
@@ -322,6 +363,14 @@ export function addLogEntry(tag, text) {
 export function adjustRisk(delta) {
   const adjusted = delta - (gameState.meta.permanentRiskDrop || 0);
   gameState.risk = clampRisk(gameState.risk + adjusted);
+  if (gameState.daily) {
+    gameState.daily.riskPeak = Math.max(gameState.daily.riskPeak || gameState.risk, gameState.risk);
+    if (gameState.daily.riskFloor === 0) {
+      gameState.daily.riskFloor = gameState.risk;
+    } else {
+      gameState.daily.riskFloor = Math.min(gameState.daily.riskFloor, gameState.risk);
+    }
+  }
 }
 
 export function recordMoneyEarned(amount) {
@@ -344,12 +393,28 @@ export function recordTravel(locationId) {
 
 export function recordRaidSurvived() {
   gameState.stats.raidsSurvived += 1;
+  gameState.stats.noRaidStreak = 0;
+  if (gameState.daily) {
+    gameState.daily.raidsToday += 1;
+    gameState.daily.hadRaid = true;
+  }
 }
 
 export function recordQuestBuff(key, amount) {
   if (key === "riskShield") {
     gameState.daily.riskShield += amount;
   }
+}
+
+export function consumeBaselineInventory(productId, quantity) {
+  if (!gameState.daily || !gameState.daily.baselineInventoryRemaining) return 0;
+  const remaining = gameState.daily.baselineInventoryRemaining[productId] || 0;
+  if (remaining <= 0) return 0;
+  const used = Math.min(remaining, quantity);
+  gameState.daily.baselineInventoryRemaining[productId] = remaining - used;
+  gameState.daily.soldFromBaseline[productId] =
+    (gameState.daily.soldFromBaseline[productId] || 0) + used;
+  return used;
 }
 
 export function useRiskShield() {
@@ -361,7 +426,14 @@ export function useRiskShield() {
 }
 
 export function resetDailyTrackers() {
-  gameState.daily = defaultDailyState();
+  const nextDaily = defaultDailyState();
+  nextDaily.baselineInventory = mergeInventoryMap(gameState.inventory, createInventoryMap());
+  nextDaily.baselineInventoryRemaining = mergeInventoryMap(gameState.inventory, createInventoryMap());
+  nextDaily.soldFromBaseline = createInventoryMap();
+  nextDaily.baselineMoney = gameState.money;
+  nextDaily.riskPeak = gameState.risk;
+  nextDaily.riskFloor = gameState.risk;
+  gameState.daily = nextDaily;
 }
 
 function mergeInventoryMap(candidate, fallback) {
