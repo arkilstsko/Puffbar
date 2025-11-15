@@ -1,42 +1,80 @@
 // market.js
-// Køb/salg logik
+// Buying and selling logic, including inventory capacity, transport perks and haptics.
 
-import { gameState, getProductById, currentCapacityUsed, logEvent } from "./state.js";
-import { showModal } from "./modal.js";
+import { gameState, currentCapacityUsed, currentCapacityMax, getTransportOption, useRiskShield } from "./state.js";
+import { getProductById, addLogEntry, adjustRisk, recordMoneyEarned, recordMoneySpent } from "./state.js";
+import { updateQuestProgress } from "./quests.js";
+import { evaluateAchievements } from "./achievements.js";
+import { saveState } from "./save.js";
+import { vibrate } from "./feedback.js";
 
-export function buyProduct(id) {
-  const price = gameState.currentPrices[id];
-  if (price == null) return;
+export function buyProduct(id, quantity = 1) {
+  const product = getProductById(id);
+  if (!product) return false;
+  const price = getEffectiveBuyPrice(id);
+  if (price == null) return false;
 
-  if (gameState.money < price) {
-    showModal("Ingen penge", "Du har ikke råd til dette køb.");
-    return;
-  }
+  const capacityFree = currentCapacityMax() - currentCapacityUsed();
+  if (capacityFree <= 0) return false;
+  const qty = Math.min(quantity, capacityFree);
+  const totalCost = price * qty;
 
-  if (currentCapacityUsed() >= gameState.capacityMax) {
-    showModal("Taske fuld", "Din backpack er helt fyldt.");
-    return;
-  }
+  if (gameState.money < totalCost) return false;
 
-  gameState.money -= price;
-  gameState.inventory[id] = (gameState.inventory[id] || 0) + 1;
-  gameState.risk = Math.min(100, gameState.risk + 1);
+  gameState.money -= totalCost;
+  recordMoneySpent(totalCost);
+  gameState.inventory[id] = (gameState.inventory[id] || 0) + qty;
 
-  const p = getProductById(id);
-  logEvent("Buy", "Market", `Købte 1x ${p.name} for $${price}.`);
+  adjustRisk(1);
+  vibrate(20);
+  addLogEntry("Buy", `Købte ${qty}x ${product.name} for $${totalCost}.`);
+  updateQuestProgress("buy", { productId: id, quantity: qty });
+  evaluateAchievements("inventory");
+  saveState();
+  return true;
 }
 
-export function sellProduct(id) {
-  const qty = gameState.inventory[id] || 0;
-  if (qty <= 0) return;
+export function sellProduct(id, quantity = 1) {
+  const product = getProductById(id);
+  if (!product) return false;
+  const owned = gameState.inventory[id] || 0;
+  if (owned <= 0) return false;
 
-  const price = gameState.currentPrices[id];
-  if (price == null) return;
+  const price = getEffectiveSellPrice(id);
+  if (price == null) return false;
+  const qty = Math.min(quantity, owned);
+  const total = price * qty;
 
-  gameState.inventory[id] = qty - 1;
-  gameState.money += price;
-  gameState.risk = Math.max(0, gameState.risk - 1);
+  gameState.inventory[id] = owned - qty;
+  gameState.money += total;
+  recordMoneyEarned(total);
 
-  const p = getProductById(id);
-  logEvent("Sell", "Market", `Solgte 1x ${p.name} for $${price}.`);
+  if (!useRiskShield()) {
+    adjustRisk(-1);
+  }
+  vibrate(18);
+  addLogEntry("Sell", `Solgte ${qty}x ${product.name} for $${total}.`);
+  updateQuestProgress("sell", { productId: id, quantity: qty });
+  updateQuestProgress("profit", { value: gameState.daily.profit });
+  evaluateAchievements("money");
+  saveState();
+  return true;
+}
+
+export function getEffectiveBuyPrice(id) {
+  const base = gameState.currentPrices[id];
+  if (base == null) return null;
+  const transport = getTransportOption();
+  const discount = (transport?.buyDiscount || 0) + (gameState.meta.permanentDiscount || 0);
+  const factor = Math.max(0.75, 1 - discount);
+  return Math.max(1, Math.round(base * factor));
+}
+
+export function getEffectiveSellPrice(id) {
+  const base = gameState.currentPrices[id];
+  if (base == null) return null;
+  const transport = getTransportOption();
+  const bonus = (transport?.sellBonus || 0) + (gameState.meta.permanentDiscount || 0);
+  const factor = 1 + bonus;
+  return Math.max(1, Math.round(base * factor));
 }
