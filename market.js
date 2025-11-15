@@ -1,12 +1,19 @@
 // market.js
 // Buying and selling logic, including inventory capacity, transport perks and haptics.
 
-import { gameState, currentCapacityUsed, currentCapacityMax, getTransportOption, useRiskShield } from "./state.js";
+import {
+  gameState,
+  currentCapacityUsed,
+  currentCapacityMax,
+  getTransportOption,
+  useRiskShield,
+  consumeBaselineInventory,
+} from "./state.js";
 import { getProductById, addLogEntry, adjustRisk, recordMoneyEarned, recordMoneySpent } from "./state.js";
 import { updateQuestProgress } from "./quests.js";
 import { evaluateAchievements } from "./achievements.js";
 import { saveState } from "./save.js";
-import { vibrate } from "./feedback.js";
+import { hapticShort } from "./feedback.js";
 
 export function buyProduct(id, quantity = 1) {
   const product = getProductById(id);
@@ -26,9 +33,11 @@ export function buyProduct(id, quantity = 1) {
   gameState.inventory[id] = (gameState.inventory[id] || 0) + qty;
 
   adjustRisk(1);
-  vibrate(20);
+  if (gameState.daily?.boughtToday) {
+    gameState.daily.boughtToday[id] = (gameState.daily.boughtToday[id] || 0) + qty;
+  }
+  hapticShort();
   addLogEntry("Buy", `Købte ${qty}x ${product.name} for $${totalCost}.`);
-  updateQuestProgress("buy", { productId: id, quantity: qty });
   evaluateAchievements("inventory");
   saveState();
   return true;
@@ -52,10 +61,14 @@ export function sellProduct(id, quantity = 1) {
   if (!useRiskShield()) {
     adjustRisk(-1);
   }
-  vibrate(18);
+  const baseline = consumeBaselineInventory(id, qty);
+  if (gameState.daily?.soldToday) {
+    gameState.daily.soldToday[id] = (gameState.daily.soldToday[id] || 0) + qty;
+  }
+  hapticShort();
   addLogEntry("Sell", `Solgte ${qty}x ${product.name} for $${total}.`);
-  updateQuestProgress("sell", { productId: id, quantity: qty });
-  updateQuestProgress("profit", { value: gameState.daily.profit });
+  updateQuestProgress("sell", { productId: id, quantity: qty, baseline });
+  updateQuestProgress("profit", { profit: gameState.daily.profit });
   evaluateAchievements("money");
   saveState();
   return true;

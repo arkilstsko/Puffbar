@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <title>PuffLord – Vape Hustle Simulator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7-icons@5/framework7-icons.css" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0d1117">
-  <link rel="apple-touch-icon" href="icons/pufflord-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#080a0f" />
+  <link rel="apple-touch-icon" href="icons/pufflord-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
@@ -19,96 +21,177 @@
   </script>
 </head>
 <body>
-  <div id="game-root">
-    <header id="game-header" class="panel">
-      <div class="logo-block">
-        <div class="logo-title">PuffLord</div>
-        <div class="logo-subtitle">Teenage Vape Hustle</div>
+  <div id="app" class="framework7-root theme-dark">
+    <div class="statusbar"></div>
+
+    <div class="views tabs safe-areas">
+      <div id="view-home" class="view view-main tab tab-active" data-name="home">
+        <div class="page home-page" data-name="home">
+          <div class="page-content" id="home-content">
+            <div class="home-hero" id="home-hero"></div>
+            <section class="card-grid" id="home-stats"></section>
+            <section class="section" id="home-inventory-section">
+              <div class="section-header">
+                <h2>Backpack</h2>
+                <button class="text-link" id="btn-open-warehouse">Warehouse</button>
+              </div>
+              <div class="list" id="inventory-list"></div>
+            </section>
+            <section class="section" id="home-log-section">
+              <div class="section-header">
+                <h2>City Feed</h2>
+                <span id="home-risk"></span>
+              </div>
+              <div class="timeline" id="event-log"></div>
+            </section>
+          </div>
+          <div class="fab fab-end-day" id="fab-end-day">
+            <a href="#">
+              <i class="icon f7-icons">moon_fill</i>
+            </a>
+          </div>
+        </div>
       </div>
-      <div class="header-stats">
-        <div class="stat-pill"><span>Day</span><strong id="stat-day">1</strong></div>
-        <div class="stat-pill"><span>Cash</span><strong id="stat-money">$0</strong></div>
-        <div class="stat-pill"><span>Location</span><strong id="stat-location">Downtown</strong></div>
-        <div class="stat-pill"><span>Capacity</span><strong><span id="stat-capacity-used">0</span>/<span id="stat-capacity-max">0</span></strong></div>
-        <div class="stat-pill"><span>Warehouse</span><strong><span id="stat-warehouse-used">0</span>/<span id="stat-warehouse-max">0</span></strong></div>
-        <div class="stat-pill"><span>Transport</span><strong id="stat-transport">Sneaker Express</strong></div>
+
+      <div id="view-market" class="view tab" data-name="market">
+        <div class="page market-page" data-name="market">
+          <div class="page-content" id="market-content">
+            <section class="section">
+              <div class="section-header">
+                <h2>Street Deals</h2>
+                <button class="icon-btn" id="btn-market-info" aria-label="Market info">
+                  <i class="icon f7-icons">info_circle_fill</i>
+                </button>
+              </div>
+              <div class="virtual-list" id="market-products"></div>
+            </section>
+            <section class="section" id="warehouse-section">
+              <div class="section-header">
+                <h2>Warehouse</h2>
+                <span id="warehouse-capacity"></span>
+              </div>
+              <div class="list" id="warehouse-list"></div>
+            </section>
+          </div>
+        </div>
       </div>
-      <div class="risk-bar-wrapper">
-        <span class="risk-label">Heat</span>
-        <div class="risk-bar"><div id="risk-bar-fill"></div></div>
-        <span id="risk-bar-text">0%</span>
+
+      <div id="view-travel" class="view tab" data-name="travel">
+        <div class="page travel-page" data-name="travel">
+          <div class="page-content" id="travel-content">
+            <div class="travel-hero">
+              <div class="travel-badge">Current District</div>
+              <h1 id="travel-location"></h1>
+              <p id="travel-flavor"></p>
+              <button class="primary-btn" id="btn-open-travel">Swipe up to travel</button>
+            </div>
+            <div class="travel-stats" id="travel-stats"></div>
+          </div>
+        </div>
       </div>
-      <div class="prestige-banner" id="prestige-banner"></div>
-    </header>
 
-    <main id="game-layout">
-      <section id="market-panel" class="panel">
-        <h2>Street Deals</h2>
-        <p class="panel-subtitle">Køb billigt, sælg dyrt. Priserne skifter hver dag.</p>
-        <div id="market-list" class="table-list"></div>
-      </section>
-
-      <section id="inventory-panel" class="panel">
-        <h2>Backpack</h2>
-        <p class="panel-subtitle">Aktuel taske kapacitet og hurtige flyt-knapper.</p>
-        <div id="inventory-list" class="table-list"></div>
-      </section>
-
-      <section id="warehouse-panel" class="panel">
-        <h2>Warehouse</h2>
-        <p class="panel-subtitle">Langtidsopbevaring – perfekt til store partier.</p>
-        <div id="warehouse-list" class="table-list"></div>
-      </section>
-
-      <section id="upgrades-panel" class="panel">
-        <h2>Upgrades & Prestige</h2>
-        <div id="upgrades-list"></div>
-      </section>
-
-      <section id="investments-panel" class="panel">
-        <h2>Investments</h2>
-        <p class="panel-subtitle">Passive hustles der giver indkomst hver dag.</p>
-        <div id="investments-list"></div>
-      </section>
-
-      <section id="quests-panel" class="panel">
-        <h2>Daily Quests</h2>
-        <div id="quests-list"></div>
-      </section>
-
-      <section id="achievements-panel" class="panel">
-        <h2>Achievements</h2>
-        <div id="achievements-list"></div>
-      </section>
-
-      <section id="status-panel" class="panel">
-        <h2>City Feed</h2>
-        <div id="news-banner"></div>
-        <div id="rival-banner"></div>
-        <div id="event-log" class="log-list"></div>
-        <h3>Travel</h3>
-        <div id="location-buttons" class="location-buttons"></div>
-      </section>
-    </main>
-
-    <footer id="game-footer" class="panel">
-      <div class="footer-actions">
-        <button id="btn-end-day" class="primary-btn">End Day</button>
-        <button id="btn-new-game" class="ghost-btn">New Game</button>
-        <button id="btn-clear-save" class="ghost-btn danger">Reset Save</button>
+      <div id="view-upgrades" class="view tab" data-name="upgrades">
+        <div class="page upgrades-page" data-name="upgrades">
+          <div class="page-content" id="upgrades-content">
+            <section class="section" id="upgrades-section">
+              <div class="section-header">
+                <h2>Upgrades</h2>
+                <span id="upgrade-points"></span>
+              </div>
+              <div class="accordion" id="upgrades-list"></div>
+            </section>
+            <section class="section" id="investments-section">
+              <div class="section-header">
+                <h2>Investments</h2>
+              </div>
+              <div class="list" id="investments-list"></div>
+            </section>
+          </div>
+        </div>
       </div>
-      <div class="footer-tip">Swipe højre for hurtig køb, venstre for hurtig salg.</div>
-    </footer>
-  </div>
 
-  <div id="modal-overlay" class="modal-hidden">
-    <div id="modal-window">
-      <h2 id="modal-title"></h2>
-      <div id="modal-body"></div>
-      <button id="modal-close" class="primary-btn">OK</button>
+      <div id="view-quests" class="view tab" data-name="quests">
+        <div class="page quests-page" data-name="quests">
+          <div class="page-content" id="quests-content">
+            <section class="section" id="daily-quests">
+              <div class="section-header">
+                <h2>Daily Quests</h2>
+                <button class="icon-btn" id="btn-quest-refresh" aria-label="Refresh quests">
+                  <i class="icon f7-icons">arrow_clockwise</i>
+                </button>
+              </div>
+              <div class="quest-list" id="quests-list"></div>
+            </section>
+            <section class="section" id="quest-rewards">
+              <div class="section-header">
+                <h2>Rewards</h2>
+              </div>
+              <div class="rewards-grid" id="quest-rewards-grid"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar tabbar toolbar-bottom" id="main-tabbar">
+      <div class="toolbar-inner">
+        <a href="#view-home" class="tab-link tab-link-active" data-tab="home">
+          <i class="icon f7-icons">house_fill</i>
+          <span>Home</span>
+        </a>
+        <a href="#view-market" class="tab-link" data-tab="market">
+          <i class="icon f7-icons">bag_fill</i>
+          <span>Market</span>
+        </a>
+        <a href="#view-travel" class="tab-link" data-tab="travel">
+          <i class="icon f7-icons">map_fill</i>
+          <span>Travel</span>
+        </a>
+        <a href="#view-upgrades" class="tab-link" data-tab="upgrades">
+          <i class="icon f7-icons">sparkles</i>
+          <span>Upgrades</span>
+        </a>
+        <a href="#view-quests" class="tab-link" data-tab="quests">
+          <i class="icon f7-icons">list_bullet</i>
+          <span>Quests</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="sheet-modal sheet-bottom" id="info-sheet">
+      <div class="sheet-modal-inner">
+        <div class="sheet-modal-handle"></div>
+        <div class="sheet-content">
+          <h2 id="info-sheet-title"></h2>
+          <div id="info-sheet-body"></div>
+          <button class="primary-btn" id="info-sheet-close">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-modal sheet-bottom sheet-large travel-sheet" id="travel-sheet">
+      <div class="sheet-modal-inner">
+        <div class="sheet-modal-handle"></div>
+        <div class="sheet-content">
+          <div class="travel-sheet-header">
+            <h2>Select Destination</h2>
+            <div id="travel-cost-summary"></div>
+          </div>
+          <div class="location-cards" id="travel-locations"></div>
+          <div class="slide-confirm" id="travel-confirm">
+            <span class="slide-label">Slide to travel</span>
+            <div class="slide-track">
+              <div class="slide-thumb" id="travel-thumb">
+                <i class="icon f7-icons">paperplane_fill</i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script type="module" src="game.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

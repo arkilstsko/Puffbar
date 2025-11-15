@@ -1,12 +1,28 @@
 // feedback.js
-// Helper for optional haptic feedback without throwing if not supported.
+// Helper for optional haptic feedback with semantic presets.
 
-export function vibrate(duration = 25) {
+function vibratePattern(pattern) {
   try {
-    if (navigator?.vibrate) {
-      navigator.vibrate(duration);
+    if (typeof navigator !== "undefined" && navigator?.vibrate) {
+      navigator.vibrate(pattern);
     }
   } catch (err) {
-    // Fail silently – haptics are optional.
+    // ignore – haptics are optional.
   }
+}
+
+export function hapticShort() {
+  vibratePattern([28]);
+}
+
+export function hapticMedium() {
+  vibratePattern([45, 30, 45]);
+}
+
+export function hapticLong() {
+  vibratePattern([80, 40, 80]);
+}
+
+export function vibrate(duration = 25) {
+  vibratePattern([duration]);
 }
